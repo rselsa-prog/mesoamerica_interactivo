@@ -224,6 +224,20 @@ button:focus-visible { outline: 3px solid #1c506c; outline-offset: 4px; }
  .mapa[data-periodo-activo="preclasico"] #monte-alban::after { right: calc(50% + 22px); }
 }
 
+
+/* Los periodos forman una secuencia continua. */
+.periodos {
+ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+ gap: 0; width: 100%;
+}
+.periodos button {
+ border: 0; border-radius: 0; margin: 0; min-width: 0;
+}
+.periodos button[aria-pressed="true"] {
+ box-shadow: inset 0 -4px 0 #30271f; font-weight: 700;
+}
+.periodos button:focus-visible { outline-offset: -3px; }
+
 </style>
 
 </head>
