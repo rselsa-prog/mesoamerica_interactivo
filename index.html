@@ -204,6 +204,26 @@ button:focus-visible { outline: 3px solid #1c506c; outline-offset: 4px; }
  .periodos button, .controles button { font-size: 14px; padding: 9px 5px; }
 }
 
+
+/* Separar los sitios cercanos de Oaxaca en pantallas pequeñas. */
+@media (max-width: 900px) {
+ .mapa[data-periodo-activo="preclasico"] #san-jose-mogote { left: calc(50.260417% - 24px); }
+ .mapa[data-periodo-activo="preclasico"] #monte-alban { left: calc(51.041667% + 24px); }
+ .mapa[data-periodo-activo="preclasico"] :is(#san-jose-mogote, #monte-alban) { width: 44px; height: 44px; }
+ .mapa[data-periodo-activo="preclasico"] :is(#san-jose-mogote, #monte-alban)::before {
+  content: ""; position: absolute; top: 50%; width: 24px; height: 2px;
+  background: #735b16; pointer-events: none;
+ }
+ .mapa[data-periodo-activo="preclasico"] #san-jose-mogote::before { left: 50%; }
+ .mapa[data-periodo-activo="preclasico"] #monte-alban::before { right: 50%; }
+ .mapa[data-periodo-activo="preclasico"] :is(#san-jose-mogote, #monte-alban)::after {
+  content: ""; position: absolute; top: calc(50% - 2px); width: 4px; height: 4px;
+  border-radius: 50%; background: #735b16; pointer-events: none;
+ }
+ .mapa[data-periodo-activo="preclasico"] #san-jose-mogote::after { left: calc(50% + 22px); }
+ .mapa[data-periodo-activo="preclasico"] #monte-alban::after { right: calc(50% + 22px); }
+}
+
 </style>
 
 </head>
@@ -397,6 +417,7 @@ function seleccionarPeriodo(periodo) {
     document.querySelectorAll('[data-periodo]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.periodo === periodo)));
     document.querySelectorAll('[data-subarea]').forEach(b => b.setAttribute('aria-pressed', 'false'));
     periodoSeleccionado = periodo;
+    document.querySelector(".mapa").dataset.periodoActivo = periodo;
     document.getElementById("aviso-subarea").style.display = "none";
     document.querySelectorAll(".puntero").forEach(p=>p.style.display="none");
 
