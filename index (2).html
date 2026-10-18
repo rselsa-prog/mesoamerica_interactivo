@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Mesoamérica en el espacio y el tiempo</title>
+
+
+<style>
+
+img {
+    display: block;
+    margin: auto;
+}
+
+.mapa {
+    position: relative;
+    width: 100%;
+    max-width: 1920px;
+    margin: auto;
+}
+
+.capa {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+display: none;
+}
+
+.controles {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.puntero {
+    position: absolute;
+    top: 23.437500%;
+    left: 15.625000%;
+    font-size: 40px;
+    z-index: 10;
+display: none;
+}
+
+#puntero-occidente {
+    top: 27.343750%;
+    left: 20.833333%;
+}
+
+.sitio {
+    position: absolute;
+    display: none;
+    z-index: 20;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#san-jose-mogote {
+    top: 57.421875%;
+    left: 50.260417%;
+}
+
+#monte-alban {
+    top: 58.984375%;
+    left: 51.041667%;
+}
+#san-lorenzo {
+    top: 50.390625%;
+    left: 54.166667%;
+}
+
+#la-venta {
+    top: 51.562500%;
+    left: 59.635417%;
+}
+
+#el-tajin {
+    top: 35.156250%;
+    left: 46.875000%;
+}
+
+#el-mirador {
+    top: 61.718750%;
+    left: 78.125000%;
+}
+
+#tikal {
+    top: 60.546875%;
+    left: 75.520833%;
+}
+
+#palenque {
+    top: 54.687500%;
+    left: 69.010417%;
+}
+#cuicuilco {
+    top: 44.140625%;
+    left: 43.489583%;
+}
+
+#teotihuacan {
+    top: 41.796875%;
+    left: 41.666667%;
+}
+
+#xochicalco {
+    top: 49.609375%;
+    left: 42.968750%;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+
+.contenido-modal {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 720px;
+    max-width: calc(100% - 40px);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+#texto-periodo {
+    white-space: pre-line;
+    line-height: 1.6;
+    text-align: left;
+}
+#el-openo{top: 42.968750%;left: 30.989583%;cursor:pointer}#chupicuaro{top: 42.187500%;left: 38.020833%;cursor:pointer}.sitio:focus-visible{outline:3px solid #936b35;outline-offset:4px}
+/* Adaptación a pantallas pequeñas */
+* { box-sizing: border-box; }
+body { margin: 0; padding: 16px; }
+h1 { text-align: center; font-size: clamp(1.4rem, 4vw, 2rem); }
+.periodos, .controles { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 12px auto; }
+button { min-height: 44px; padding: 10px 14px; cursor: pointer; font: inherit; }
+.mapa > img:first-child { width: 100%; height: auto; }
+.capa { height: auto; pointer-events: none; }
+.sitio { white-space: nowrap; padding: 6px 2px; line-height: 1.2; }
+.modal { padding: 12px; height: 100%; height: 100dvh; }
+.contenido-modal { width: 720px; max-width: 100%; max-height: 100%; padding: clamp(16px, 4vw, 30px); overscroll-behavior: contain; }
+.contenido-modal h2 { font-size: clamp(1.15rem, 4vw, 1.5rem); overflow-wrap: anywhere; }
+#texto-ficha, #texto-periodo { font-size: 1rem; line-height: 1.6; white-space: pre-line; }
+#imagen-ficha img { width: auto; max-width: 100%; height: auto; }
+@media (max-width: 600px) {
+ body { padding: 8px; }
+ .sitio { font-size: 12px; }
+ .contenido-modal { border-radius: 8px; }
+ #imagen-ficha img { max-height: 210px !important; }
+}
+
+
+/* Controles y puntos del mapa */
+.periodos, .controles { gap: 8px; max-width: 800px; }
+.periodos button, .controles button {
+ border: 2px solid transparent; border-radius: 12px; color: #231e19;
+ font-family: system-ui, sans-serif; font-size: 15px; line-height: 1.2;
+ min-height: 44px; padding: 10px 14px; transition: box-shadow .15s;
+}
+.periodos button[data-periodo="preclasico"] { background: #eee5d8; }
+.periodos button[data-periodo="clasico"] { background: #d5b78e; }
+.periodos button[data-periodo="posclasico"] { background: #a46a32; color: white; }
+.controles button[data-subarea="occidente"] { background: rgba(147,107,53,.23); }
+.controles button[data-subarea="norte"] { background: rgba(112,80,140,.23); }
+.controles button[data-subarea="centro"] { background: rgba(75,145,189,.25); }
+.controles button[data-subarea="golfo"] { background: rgba(193,91,181,.23); }
+.controles button[data-subarea="oaxaca"] { background: rgba(212,173,50,.28); }
+.controles button[data-subarea="sureste"] { background: rgba(184,121,89,.25); }
+.periodos button[aria-pressed="true"], .controles button[aria-pressed="true"] {
+ border-color: #30271f; box-shadow: 0 0 0 2px white, 0 0 0 3px #30271f;
+ font-weight: 700;
+}
+button:focus-visible { outline: 3px solid #1c506c; outline-offset: 4px; }
+.mapa .sitio {
+ width: 32px; height: 32px; padding: 0; transform: translate(-50%,-50%);
+ cursor: pointer; border-radius: 50%; touch-action: manipulation;
+}
+.piramide-sitio { position: absolute; width: 20px; height: 18px; top: 50%; left: 50%;
+ transform: translate(-50%,-50%); pointer-events: none;
+ filter: drop-shadow(0 1px 1px white) drop-shadow(0 -1px 1px white); }
+.piramide-sitio::before { content: ""; position: absolute; inset: 0;
+ background: #30251a;
+ clip-path: polygon(40% 0,60% 0,60% 20%,70% 20%,70% 40%,80% 40%,80% 60%,90% 60%,90% 80%,100% 80%,100% 100%,0 100%,0 80%,10% 80%,10% 60%,20% 60%,20% 40%,30% 40%,30% 20%,40% 20%); }
+.piramide-sitio::after { content: ""; position: absolute; width: 3px; top: 4px; bottom: 1px; left: calc(50% - 1.5px); background: #e7d7b9; }
+.sitio:focus-visible { outline: 3px solid #201c17; outline-offset: 1px; }
+@media (max-width: 600px) {
+ h1 { font-size: 1.45rem; line-height: 1.15; margin: 12px 0; }
+ .periodos { display: grid; grid-template-columns: repeat(3,1fr); }
+ .controles { display: grid; grid-template-columns: repeat(3,1fr); }
+ .periodos button, .controles button { font-size: 14px; padding: 9px 5px; }
+}
+
+</style>
+
+</head>
+
+<body>
+<h1>Mesoamérica en el espacio y el tiempo</h1>
+
+<div class="periodos">
+    <button data-periodo="preclasico" aria-pressed="false" onclick="seleccionarPeriodo('preclasico')">Preclásico</button>
+    <button data-periodo="clasico" aria-pressed="false" onclick="seleccionarPeriodo('clasico')">Clásico</button>
+    <button data-periodo="posclasico" aria-pressed="false" onclick="seleccionarPeriodo('posclasico')">Posclásico</button>
+</div>
+
+<div class="controles">
+  <button data-subarea="occidente" aria-pressed="false" onclick="seleccionarSubarea('occidente')">Occidente</button>
+   <button data-subarea="norte" aria-pressed="false" onclick="seleccionarSubarea('norte')">Norte</button>
+   <button data-subarea="centro" aria-pressed="false" onclick="seleccionarSubarea('centro')">Centro</button>
+  <button data-subarea="golfo" aria-pressed="false" onclick="seleccionarSubarea('golfo')">Golfo</button>
+<button data-subarea="oaxaca" aria-pressed="false" onclick="seleccionarSubarea('oaxaca')">Oaxaca</button>
+<button data-subarea="sureste" aria-pressed="false" onclick="seleccionarSubarea('sureste')">Sureste</button>
+</div>
+
+<div id="aviso-subarea" role="status" style="display:none;max-width:850px;margin:16px auto;padding:18px 24px;background:#f5f1e8;border-left: 5px solid #936b35;line-height:1.6"></div>
+<div class="mapa">
+
+<img src="imagenes/mapa_base.png">
+<img id="occidente" class="capa" src="imagenes/capa_occidente.png">
+
+<div id="tzintzuntzan"
+     class="sitio sitio-occidente sitio-posclasico"
+    
+    
+     onclick="abrirFichaOccidente('tzintzuntzan')"
+     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOccidente('tzintzuntzan');}"
+     style="top: 46.093750%;left: 35.416667%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Tzintzuntzan"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<div id="puntero-occidente" class="puntero" onclick="abrirModal()">ⓘ</div>
+<div id="el-openo" class="sitio sitio-occidente sitio-preclasico" onclick="abrirFichaOccidente('el-openo')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOccidente('el-openo')}" role="button" tabindex="0" aria-label="Abrir ficha de El Opeño"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<div id="chupicuaro" class="sitio sitio-occidente sitio-preclasico" onclick="abrirFichaOccidente('chupicuaro')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOccidente('chupicuaro')}" role="button" tabindex="0" aria-label="Abrir ficha de Chupícuaro"><span class="piramide-sitio" aria-hidden="true"></span></div>
+
+<div id="guachimontones"
+     class="sitio sitio-occidente sitio-clasico"
+    
+    
+     onclick="abrirFichaOccidente('guachimontones')"
+     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOccidente('guachimontones');}"
+     style="top: 37.500000%;left: 26.041667%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Guachimontones"><span class="piramide-sitio" aria-hidden="true"></span></div>
+
+<img id="norte" class="capa" src="imagenes/capa_norte.png">
+
+<div id="la-quemada"
+     class="sitio sitio-norte sitio-clasico"
+    
+    
+     onclick="abrirFichaNorte('la-quemada')"
+     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaNorte('la-quemada');}"
+     style="top: 28.125000%;left: 28.645833%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de La Quemada"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<img id="centro" class="capa" src="imagenes/capa_centro.png">
+
+<div id="tula"
+     class="sitio sitio-centro sitio-posclasico"
+    
+    
+     onclick="abrirFichaCentro('tula')"
+     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaCentro('tula');}"
+     style="top: 39.062500%;left: 40.104167%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Tula"><span class="piramide-sitio" aria-hidden="true"></span></div>
+
+<div id="tenochtitlan"
+     class="sitio sitio-centro sitio-posclasico"
+    
+    
+     onclick="abrirFichaCentro('tenochtitlan')"
+     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaCentro('tenochtitlan');}"
+     style="top: 44.921875%;left: 41.666667%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de México-Tenochtitlan"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<div id="cuicuilco"
+     class="sitio sitio-centro sitio-preclasico"
+     onclick="abrirFichaCentro('cuicuilco')"
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Cuicuilco" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<div id="teotihuacan"
+     class="sitio sitio-centro sitio-clasico"
+     onclick="abrirFichaCentro('teotihuacan')"
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Teotihuacan" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
+
+<div id="xochicalco"
+     class="sitio sitio-centro sitio-clasico"
+     onclick="abrirFichaCentro('xochicalco')"
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Xochicalco" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<img id="golfo" class="capa" src="imagenes/capa_golfo.png">
+
+<div id="cempoala"
+     class="sitio sitio-golfo sitio-posclasico"
+    
+    
+     onclick="abrirFichaGolfo('cempoala')"
+     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaGolfo('cempoala');}"
+     style="top:45%;left:51%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Cempoala"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<div id="san-lorenzo"
+     class="sitio sitio-golfo sitio-preclasico"
+     onclick="abrirFichaGolfo('san-lorenzo')"
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de San Lorenzo" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
+
+<div id="la-venta"
+     class="sitio sitio-golfo sitio-preclasico"
+     onclick="abrirFichaGolfo('la-venta')"
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de La Venta" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<div id="el-tajin"
+     class="sitio sitio-golfo sitio-clasico"
+     onclick="abrirFichaGolfo('el-tajin')"
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de El Tajín" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<img id="oaxaca" class="capa" src="imagenes/capa_oaxaca.png">
+
+<div id="tilantongo"
+     class="sitio sitio-oaxaca sitio-posclasico"
+    
+    
+     onclick="abrirFichaOaxaca('tilantongo')"
+     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOaxaca('tilantongo');}"
+     style="top:55%;left:48%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Tilantongo"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<div id="san-jose-mogote"
+     class="sitio sitio-oaxaca sitio-preclasico"
+     onclick="abrirFichaOaxaca('san-jose-mogote')"
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de San José Mogote" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
+
+<div id="monte-alban"
+     class="sitio sitio-oaxaca sitio-preclasico sitio-clasico"
+     onclick="abrirFichaOaxaca('monte-alban')"
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Monte Albán" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<img id="sureste" class="capa" src="imagenes/capa_sureste.png">
+
+<div id="chichen-itza"
+     class="sitio sitio-sureste sitio-posclasico"
+    
+    
+     onclick="abrirFichaSureste('chichen-itza')"
+     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaSureste('chichen-itza');}"
+     style="top: 42.5%;left: 82%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Chichén Itzá"><span class="piramide-sitio" aria-hidden="true"></span></div>
+
+<div id="el-mirador"
+     class="sitio sitio-sureste sitio-preclasico"
+     onclick="abrirFichaSureste('el-mirador')"
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de El Mirador" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
+
+<div id="tikal"
+     class="sitio sitio-sureste sitio-clasico"
+     onclick="abrirFichaSureste('tikal')"
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Tikal" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
+
+<div id="palenque"
+     class="sitio sitio-sureste sitio-clasico"
+     onclick="abrirFichaSureste('palenque')"
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Palenque" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
+
+</div>
+
+<div id="modal" class="modal">
+    <div class="contenido-modal">
+        <h2 id="titulo-ficha">Occidente</h2>
+
+<figure id="imagen-ficha" style="display:none; margin:20px 0; text-align:center;">
+  <img
+    src="imagenes/chupicuaro_vasija.png"
+    alt="Vasija de la cultura Chupícuaro que representa un cetáceo"
+    style="max-width:100%; max-height:280px; object-fit:contain;"
+  >
+  <figcaption style="font-size:12px; color:#666; margin-top: 0.625000%;">
+    Fotografía: Didier Descouens, 2024. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es"
+       target="_blank" rel="noopener">CC BY-SA 4.0</a>.
+  </figcaption>
+</figure>
+
+        <p id="texto-ficha">Elige un periodo y una subárea para explorar los sitios incluidos.</p>
+        <button onclick="cerrarModal()">Cerrar</button>
+    </div>
+</div>
+
+<div id="modal-periodo" class="modal">
+    <div class="contenido-modal">
+        <h2 id="titulo-periodo"></h2>
+        <p id="texto-periodo"></p>
+        <button onclick="explorarPeriodo()">Explorar sitios del periodo</button>
+    </div>
+</div>
+
+<script>
+
+let periodoSeleccionado = "";
+
+let subareaSeleccionada = "";
+
+function seleccionarPeriodo(periodo) {
+    document.querySelectorAll('[data-periodo]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.periodo === periodo)));
+    document.querySelectorAll('[data-subarea]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    periodoSeleccionado = periodo;
+    document.getElementById("aviso-subarea").style.display = "none";
+    document.querySelectorAll(".puntero").forEach(p=>p.style.display="none");
+
+const sitios = document.querySelectorAll(".sitio");
+
+sitios.forEach(function(sitio) {
+    sitio.style.display = "none";
+});
+
+const capas = document.querySelectorAll(".capa");
+
+capas.forEach(function(capa) {
+    capa.style.display = "none";
+});
+
+    if (periodo === "preclasico") {
+        document.getElementById("titulo-periodo").textContent =
+            "Preclásico (2500 a. C.–200 d. C.)";
+
+        document.getElementById("texto-periodo").textContent =
+            "Se consolida el sedentarismo agrícola y aumenta la población. La especialización del trabajo y el intercambio acompañan una creciente diferenciación social. Los asentamientos pasan de caseríos y aldeas a centros regionales, algunos de carácter protourbano, mientras surgen formas de organización social y política cada vez más jerarquizadas.";
+
+        document.getElementById("modal-periodo").style.display = "flex";
+    }
+if (periodo === "clasico") {
+    document.getElementById("titulo-periodo").textContent =
+        "Clásico (200–900 d. C.)";
+
+    document.getElementById("texto-periodo").textContent =
+        "Durante el Clásico se consolidan grandes centros urbanos planificados, con arquitectura monumental y gobiernos centralizados en los que las élites ejercen un fuerte control político, religioso e ideológico. Se desarrollan extensas redes de intercambio a larga distancia y, durante el Clásico temprano, destaca la influencia de Teotihuacan sobre distintas regiones de Mesoamérica.\n\nA partir de ca. 650 d. C., el declive de los grandes estados hegemónicos da lugar a una reorganización de las relaciones político-económicas interregionales y a la proliferación de capitales regionales. Este periodo, conocido también como Epiclásico, se prolonga aproximadamente hasta 900 d. C.";
+
+    document.getElementById("modal-periodo").style.display = "flex";
+}
+
+if (periodo === "posclasico") {
+    document.getElementById("titulo-periodo").textContent =
+        "Posclásico (ca. 900 d. C.–conquista española)";
+    document.getElementById("texto-periodo").textContent =
+        "El Posclásico mesoamericano comienza aproximadamente en 900 d. C. y se extiende hasta la conquista española. Se caracteriza por una reorganización política, económica y cultural tras la crisis de los grandes centros del Clásico. Entre sus principales rasgos destacan:\n\nInestabilidad política y militarismo: proliferación de conflictos armados, fortalecimiento de las élites guerreras y expansión de estados mediante conquistas y alianzas.\n\nReorganización de los centros de poder: surgimiento de nuevas capitales y entidades políticas, con frecuentes cambios en las relaciones de dominio.\n\nIntensificación del comercio: ampliación de las redes de intercambio a larga distancia y creciente importancia de los comerciantes.\n\nMovimientos migratorios: desplazamientos y asentamientos de distintos grupos, especialmente procedentes del norte, que contribuyeron a nuevas configuraciones culturales.";
+    document.getElementById("modal-periodo").style.display = "flex";
+}
+
+}
+
+
+
+function explorarPeriodo() {
+    document.getElementById("modal-periodo").style.display = "none";
+}
+
+function seleccionarSubarea(subarea) {
+    document.querySelectorAll('[data-subarea]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.subarea === subarea)));
+    subareaSeleccionada = subarea;
+    mostrarCapa(subarea);
+
+    document.querySelectorAll(".puntero").forEach(p=>p.style.display="none");
+    document.getElementById("aviso-subarea").style.display="none";
+    const sitios = document.querySelectorAll(".sitio");
+
+    sitios.forEach(function(sitio) {
+        sitio.style.display = "none";
+    });
+
+if (periodoSeleccionado === "clasico" && subarea === "occidente") {
+    document.getElementById("guachimontones").style.display = "block";
+}
+
+if (periodoSeleccionado === "clasico" && subarea === "norte") {
+    document.getElementById("la-quemada").style.display = "block";
+}
+
+if (periodoSeleccionado === "posclasico" && subarea === "centro") {
+    document.getElementById("tula").style.display = "block";
+    document.getElementById("tenochtitlan").style.display = "block";
+}
+
+if (periodoSeleccionado === "posclasico" && subarea === "sureste") {
+    document.getElementById("chichen-itza").style.display = "block";
+}
+
+if (periodoSeleccionado === "posclasico" && subarea === "occidente") {
+    document.getElementById("tzintzuntzan").style.display = "block";
+}
+
+if (periodoSeleccionado === "posclasico" && subarea === "oaxaca") {
+    document.getElementById("tilantongo").style.display = "block";
+}
+
+if (periodoSeleccionado === "posclasico" && subarea === "golfo") {
+    document.getElementById("cempoala").style.display = "block";
+}
+
+if (periodoSeleccionado === "posclasico" && subarea === "norte") {
+    mostrarAviso(
+        "Norte · Posclásico: cambios y migraciones",
+        "Durante el Posclásico, muchas poblaciones de la Mesoamérica septentrional experimentaron cambios en sus asentamientos y formas de vida. Escalante señala que el abandono de numerosos centros del Bajío, los Altos de Jalisco y la Sierra Madre Occidental estuvo acompañado por migraciones hacia los valles del Centro de México y la región de Michoacán.\n\nEstos desplazamientos contribuyeron a nuevas configuraciones políticas y culturales. En las fuentes coloniales, distintos grupos procedentes del norte fueron llamados chichimecas; esta denominación reunía poblaciones con historias y formas de vida diversas. El cambio de los asentamientos no significó que el Norte quedara vacío: continuaron habitándolo sociedades agrícolas y grupos dedicados a la caza y la recolección.\n\nFuente: Pablo Escalante Gonzalbo, «El México antiguo», en Nueva historia mínima de México, El Colegio de México."
+    );
+
+    document.getElementById("texto-ficha").style.whiteSpace = "pre-line";
+    return;
+}
+
+    if (periodoSeleccionado === "preclasico" && subarea === "occidente") {
+        document.getElementById("el-openo").style.display="block";
+        document.getElementById("chupicuaro").style.display="block";
+        mostrarAviso("Occidente en el Preclásico", "Las sociedades del Occidente desarrollaron diversas tradiciones regionales. El Opeño y Chupícuaro permiten explorar sus prácticas funerarias y producción cerámica. Selecciona sus nombres en el mapa para conocerlos.");
+    }
+   if (periodoSeleccionado === "preclasico" && subarea === "norte") {
+  mostrarAviso(
+    "Norte al final del Preclásico",
+    "Hacia finales del Preclásico, poblaciones agrícolas se establecieron al norte del río Lerma, en lugares donde las lluvias permitían cultivar. También se desarrollaron relaciones entre los pueblos de Occidente y del noroeste. Fuente: Beatriz Braniff, La frontera septentrional de Mesoamérica, p. 163."
+  );
+}
+    if (periodoSeleccionado === "preclasico" && subarea === "oaxaca") {
+        document.getElementById("san-jose-mogote").style.display = "block";
+document.getElementById("monte-alban").style.display = "block";
+    }
+if (periodoSeleccionado === "clasico" && subarea === "oaxaca") {
+    document.getElementById("monte-alban").style.display = "block";
+}
+if (periodoSeleccionado === "preclasico" && subarea === "golfo") {
+    document.getElementById("san-lorenzo").style.display = "block";
+    document.getElementById("la-venta").style.display = "block";
+}
+
+if (periodoSeleccionado === "clasico" && subarea === "golfo") {
+    document.getElementById("el-tajin").style.display = "block";
+}
+if (periodoSeleccionado === "preclasico" && subarea === "sureste") {
+    document.getElementById("el-mirador").style.display = "block";
+}
+
+if (periodoSeleccionado === "clasico" && subarea === "sureste") {
+    document.getElementById("tikal").style.display = "block";
+}
+
+if (periodoSeleccionado === "clasico" && subarea === "sureste") {
+    document.getElementById("tikal").style.display = "block";
+    document.getElementById("palenque").style.display = "block";
+}
+
+if (periodoSeleccionado === "preclasico" && subarea === "centro") {
+    document.getElementById("cuicuilco").style.display = "block";
+}
+if (periodoSeleccionado === "clasico" && subarea === "centro") {
+    document.getElementById("teotihuacan").style.display = "block";
+}
+
+if (periodoSeleccionado === "clasico" && subarea === "centro") {
+    document.getElementById("teotihuacan").style.display = "block";
+    document.getElementById("xochicalco").style.display = "block";
+}
+    if (!periodoSeleccionado) {
+        mostrarAviso("Selecciona un periodo", "La capa muestra la ubicación de la subárea. Elige Preclásico, Clásico o Posclásico y después vuelve a seleccionar la subárea para explorar sus sitios.");
+    } else if (!Array.from(sitios).some(s=>s.style.display==="block") && !(periodoSeleccionado==="preclasico" && subarea==="norte")) {
+        mostrarAviso("Sitios por incorporar", "Esta combinación de periodo y subárea todavía no tiene sitios incluidos en el recurso. Esto no significa que no existieran asentamientos o desarrollos culturales.");
+    }
+
+}
+
+function mostrarCapa(id) {
+
+    const capas = document.querySelectorAll(".capa");
+    const punteros = document.querySelectorAll(".puntero");
+    const capaSeleccionada = document.getElementById(id);
+    const punteroSeleccionado = document.getElementById("puntero-" + id);
+
+    capas.forEach(function(capa) {
+        capa.style.display = "none";
+    });
+
+    punteros.forEach(function(puntero) {
+        puntero.style.display = "none";
+    });
+
+    capaSeleccionada.style.display = "block";
+
+    if (punteroSeleccionado) {
+        punteroSeleccionado.style.display = "block";
+    }
+}
+function mostrarAviso(titulo, texto) {
+
+document.getElementById("imagen-ficha").style.display = "none";
+    document.getElementById("aviso-subarea").style.display = "none";
+
+    document.getElementById("titulo-ficha").textContent = titulo;
+    document.getElementById("texto-ficha").textContent = texto;
+
+    const ventana = document.querySelector("#modal .contenido-modal");
+    ventana.style.borderLeft = titulo.startsWith("Norte")
+  ? "6px solid #70508c"
+  : "6px solid #936b35";
+
+    abrirModal();
+}
+
+function abrirFichaNorte(id) {
+  if (id !== "la-quemada") return;
+
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #70508c";
+
+  document.getElementById("titulo-ficha").textContent =
+    "La Quemada · Zacatecas · Clásico";
+
+  const texto = document.getElementById("texto-ficha");
+  texto.style.whiteSpace = "pre-line";
+  texto.textContent =
+    "La Quemada fue un importante centro de la Mesoamérica septentrional y alcanzó su mayor desarrollo entre 600 y 850 d. C. Sus habitantes acondicionaron las laderas de un cerro con terrazas para construir plazas, edificios y espacios habitacionales. Entre sus principales construcciones destacan el Salón de las Columnas, la Pirámide Votiva y una cancha de juego de pelota.\n\nBeatriz Braniff sitúa este asentamiento entre los desarrollos del Norte que florecieron durante el Clásico, en una región relacionada con Occidente y aparentemente autónoma del poder de Teotihuacán. La Quemada permite reconocer que las sociedades del Norte construyeron centros de poder y participaron en redes de relaciones con otras regiones mesoamericanas.\n\nFuentes: Beatriz Braniff, La frontera septentrional de Mesoamérica, p. 164; INAH, Zona Arqueológica La Quemada.";
+
+  const figura = document.getElementById("imagen-ficha");
+  figura.style.display = "block";
+  figura.querySelector("img").src = "imagenes/la_quemada.jpg";
+  figura.querySelector("img").alt =
+    "Salón de las Columnas de La Quemada, Zacatecas";
+
+  figura.querySelector("figcaption").innerHTML = `
+    Salón de las Columnas, La Quemada, Zacatecas.
+    Fotografía: OrniCosa, 2007. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by/2.0/deed.es"
+       target="_blank" rel="noopener">CC BY 2.0</a>.
+  `;
+
+  abrirModal();
+}
+
+function abrirFichaOccidente(id) {
+
+if (id === "tzintzuntzan") {
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #936b35";
+
+  document.getElementById("titulo-ficha").textContent =
+    "Tzintzuntzan · Michoacán · Posclásico tardío · siglos XIV–XVI";
+
+  const texto = document.getElementById("texto-ficha");
+  texto.style.whiteSpace = "pre-line";
+  texto.textContent =
+    "Tzintzuntzan fue uno de los principales centros políticos y religiosos del poder purépecha, en la región del lago de Pátzcuaro. Durante el Posclásico tardío, el Estado purépecha extendió su dominio sobre numerosas comunidades mediante la conquista y la tributación. Sus ciudades concentraron actividades de gobierno, ceremonias y producción especializada, entre ellas el trabajo de los metales.\n\nEscalante destaca que este poder logró resistir a los ejércitos de la Triple Alianza encabezada por México-Tenochtitlan. La defensa de su territorio se apoyó en fortificaciones, vigilancia y una organización militar con mando unificado. Tzintzuntzan permite reconocer que en el Posclásico coexistieron grandes poderes regionales y que el dominio mexica tuvo límites.\n\nFuente: Pablo Escalante Gonzalbo, «El México antiguo», en Nueva historia mínima de México, El Colegio de México.";
+
+  const figura = document.getElementById("imagen-ficha");
+  figura.style.display = "block";
+  figura.querySelector("img").src = "imagenes/tzintzuntzan.jpg";
+  figura.querySelector("img").alt =
+    "Vista de las yácatas de Tzintzuntzan, Michoacán";
+
+  figura.querySelector("figcaption").innerHTML = `
+    Yácatas de Tzintzuntzan, Michoacán.
+    Fotografía: Arian Zwegers, 2015. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by/2.0/deed.es"
+       target="_blank" rel="noopener">CC BY 2.0</a>.
+  `;
+
+  abrirModal();
+  return;
+}
+
+if (id === "guachimontones") {
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #936b35";
+
+  document.getElementById("titulo-ficha").textContent =
+    "Guachimontones · Teuchitlán, Jalisco · Clásico";
+
+  const texto = document.getElementById("texto-ficha");
+  texto.style.whiteSpace = "pre-line";
+  texto.textContent =
+    "Guachimontones permite reconocer una de las características de los centros ceremoniales del Occidente mesoamericano: la disposición de plataformas y plazas circulares. Esta arquitectura formó parte de una tradición regional que también se expresó en las tumbas de tiro y en la elaboración de figuras de cerámica que representan animales y escenas de la vida cotidiana.\n\nDurante el Clásico, los asentamientos de Nayarit, Jalisco y Colima mantuvieron relaciones con los pueblos de la Sierra Madre Occidental y de la costa del Pacífico. Según Pablo Escalante, sus vínculos se orientaron más hacia este sistema regional que hacia Teotihuacán. Su estudio permite reconocer la diversidad de las sociedades mesoamericanas y las distintas redes de relaciones que construyeron.\n\nFuente: Pablo Escalante Gonzalbo, «El México antiguo», en Nueva historia mínima de México, El Colegio de México.";
+
+  const figura = document.getElementById("imagen-ficha");
+  figura.style.display = "block";
+  figura.querySelector("img").src = "imagenes/guachimontones.jpg";
+  figura.querySelector("img").alt =
+    "Estructura circular escalonada de Guachimontones, en Teuchitlán, Jalisco";
+  figura.querySelector("figcaption").innerHTML = `
+    Guachimontones, Teuchitlán, Jalisco.
+    Fotografía: Esteban Tucci. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es"
+       target="_blank" rel="noopener">CC BY-SA 3.0</a>.
+  `;
+
+  abrirModal();
+  return;
+}
+
+const figura = document.getElementById("imagen-ficha");
+const foto = figura.querySelector("img");
+const credito = figura.querySelector("figcaption");
+
+figura.style.display = "block";
+
+if (id === "el-openo") {
+  foto.src = "imagenes/el_openo.png";
+  foto.alt = "Cerámica y figurillas procedentes de El Opeño, Michoacán";
+
+  credito.innerHTML = `
+    Piezas prehispánicas procedentes de Opeño, Michoacán.
+    Colección Prehispánico, Serie Cuicuilco, ca. 1950.
+    Fototeca Nacional. Coordinación Nacional de Difusión.
+    © México. Secretaría de Cultura. INAH.
+    <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es"
+       target="_blank" rel="noopener">CC BY-NC-ND 4.0</a>.
+    <a href="https://repositorio.inah.gob.mx/o-377427"
+       target="_blank" rel="noopener">Fuente</a>.
+  `;
+} else if (id === "chupicuaro") {
+  foto.src = "imagenes/chupicuaro_vasija.png";
+  foto.alt = "Vasija de la cultura Chupícuaro que representa un cetáceo";
+
+  credito.innerHTML = `
+    Fotografía: Didier Descouens, 2024. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es"
+       target="_blank" rel="noopener">CC BY-SA 4.0</a>.
+    Fondo eliminado mediante IA.
+  `;
+} else {
+  figura.style.display = "none";
+}
+
+ const fichas={
+ "el-openo":["El Opeño · Michoacán · Preclásico", "Sus tumbas y ofrendas son testimonios de las prácticas funerarias del Occidente. López Austin y López Luján describen una tumba con restos de diez individuos, recipientes y figurillas cerámicas. Este sitio permite reconocer desarrollos regionales que no se reducen a las grandes capitales monumentales. Fuente: El pasado indígena, p. 94."],
+ "chupicuaro":["Chupícuaro · Guanajuato · Preclásico Tardío", "Aldea situada en los bancos del río Lerma, destacada por sus ofrendas funerarias y su producción cerámica. Los autores mencionan más de 400 tumbas, instrumentos musicales y cerámica con diseños rojos y negros. Su alfarería compartía estilos con sitios de Occidente, Norte y Centro de Mesoamérica. Fuente: López Austin y López Luján, El pasado indígena, pp. 94–95."]
+ };document.getElementById("titulo-ficha").textContent=fichas[id][0];document.getElementById("texto-ficha").textContent=fichas[id][1];abrirModal();}
+
+function abrirFichaGolfo(id) {
+
+if (id === "cempoala") {
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #c15bb5";
+
+  document.getElementById("titulo-ficha").textContent =
+    "Cempoala y los totonacos · Veracruz · Posclásico";
+
+  const texto = document.getElementById("texto-ficha");
+  texto.style.whiteSpace = "pre-line";
+  texto.textContent =
+    "Cempoala fue uno de los principales centros totonacos del Golfo de México. Escalante describe las ciudades totonacas como poblaciones prósperas, con canales de riego y drenaje, huertas y cultivos de maíz, cacao, vainilla y algodón. Esta riqueza agrícola formaba parte de una economía vinculada con el intercambio entre regiones.\n\nDurante el Posclásico tardío, Cempoala quedó sometida al dominio mexica y concentró los tributos de numerosas comunidades. Escalante explica que las obligaciones tributarias y el sometimiento político llevaron a los totonacos a buscar en Cortés un aliado contra los mexicas. Su participación permite comprender cómo los conflictos entre pueblos mesoamericanos influyeron en las alianzas de la conquista.\n\nFuentes: Pablo Escalante Gonzalbo, «El México antiguo», en Nueva historia mínima de México; INAH, Zona Arqueológica de Cempoala.";
+
+  const figura = document.getElementById("imagen-ficha");
+  figura.style.display = "block";
+  figura.querySelector("img").src = "imagenes/cempoala.jpg";
+  figura.querySelector("img").alt =
+    "Vista de la plaza y los edificios de Cempoala, Veracruz";
+
+  figura.querySelector("figcaption").innerHTML = `
+    Zona arqueológica de Cempoala, Veracruz.
+    Fotografía: Arian Zwegers, 2015. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by/2.0/deed.es"
+       target="_blank" rel="noopener">CC BY 2.0</a>.
+  `;
+
+  abrirModal();
+  return;
+}
+if (id === "el-tajin") {
+  const figura = document.getElementById("imagen-ficha");
+figura.style.display = "block";
+figura.querySelector("img").src = "imagenes/el_tajin.jpg";
+figura.querySelector("img").alt =
+  "Pirámide de los Nichos de El Tajín, Veracruz";
+figura.querySelector("figcaption").innerHTML = `
+  Pirámide de los Nichos, El Tajín, Veracruz.
+  Fotografía: Frank C. Müller, 2005.
+  <a href="https://commons.wikimedia.org/wiki/File:El_Tajín,_Nischenpyramide.(fcm).jpg"
+     target="_blank" rel="noopener">Wikimedia Commons</a>.
+  <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es"
+     target="_blank" rel="noopener">CC BY-SA 3.0</a>.
+`;
+
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #c15bb5";
+
+  document.getElementById("titulo-ficha").textContent =
+    "El Tajín · Veracruz · Clásico Tardío";
+
+  const texto = document.getElementById("texto-ficha");
+  texto.style.whiteSpace = "pre-line";
+  texto.textContent =
+    "Entre aproximadamente 600 y 900 d. C., El Tajín se desarrolló como un importante centro regional del Golfo de México. Su crecimiento formó parte de una época de reorganización política y de las redes de intercambio, tras el declive de Teotihuacán. Sus plazas, edificios monumentales y decoraciones con nichos muestran una tradición arquitectónica propia, cuyo ejemplo más conocido es la Pirámide de los Nichos.\n\nLas numerosas canchas y los relieves del Juego de Pelota Sur muestran la importancia social y ceremonial de esta práctica, compartida por distintas sociedades mesoamericanas. El Tajín permite reconocer tanto los rasgos propios de los centros del Golfo como su participación en un mundo de relaciones entre regiones, durante los últimos siglos del Clásico.\n\nFuente: INAH, Zona Arqueológica El Tajín y museo de sitio.";
+
+  abrirModal();
+  return;
+}
+ if (id === "la-venta") {
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #c15bb5";
+
+  const figura = document.getElementById("imagen-ficha");
+
+figura.style.display = "block";
+figura.querySelector("img").src = "imagenes/la_venta.jpg";
+figura.querySelector("img").alt =
+  "Cara sur de la pirámide de La Venta, Tabasco";
+
+figura.querySelector("figcaption").innerHTML = `
+  Cara sur de la pirámide de La Venta, Tabasco.
+  Fotografía: Alfonsobouchot, 2010. Dominio público.
+  <a href="https://commons.wikimedia.org/w/index.php?curid=10619928"
+     target="_blank" rel="noopener">Wikimedia Commons</a>.
+`;
+
+  document.getElementById("titulo-ficha").textContent =
+    "La Venta · Tabasco · Preclásico";
+
+  document.getElementById("texto-ficha").textContent =
+    "La Venta fue uno de los principales centros olmecas. Alcanzó su mayor esplendor después del declive de San Lorenzo. Sus plazas, su gran pirámide y sus ofrendas muestran la importancia de las ceremonias y la organización del trabajo colectivo. Alrededor del centro monumental vivía una extensa población en un territorio de ríos y pantanos. Fuente: López Austin y López Luján, El pasado indígena, p. 103.";
+
+  abrirModal();
+  return;
+}
+
+if (id !== "san-lorenzo") return;
+document.querySelector("#modal .contenido-modal").style.borderLeft =
+  "6px solid #c15bb5";
+
+ const figura = document.getElementById("imagen-ficha");
+
+figura.style.display = "block";
+figura.querySelector("img").src = "imagenes/san_lorenzo.jpg";
+figura.querySelector("img").alt =
+  "Vistas frontal y lateral de la cabeza colosal 1 de San Lorenzo";
+
+figura.querySelector("figcaption").innerHTML = `
+  Cabeza colosal 1 de San Lorenzo, «El Rey».
+  Museo de Antropología de Xalapa.
+  Fotografía: Vivero~commonswiki, 2005.
+  <a href="https://commons.wikimedia.org/wiki/File:CabezaColosal1_MuseoXalapa.jpg"
+     target="_blank" rel="noopener">Wikimedia Commons</a>.
+  <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es"
+     target="_blank" rel="noopener">CC BY-SA 3.0</a>.
+`;
+
+  document.getElementById("titulo-ficha").textContent =
+    "San Lorenzo · Veracruz · Preclásico";
+
+  document.getElementById("texto-ficha").textContent =
+    "San Lorenzo fue uno de los principales centros olmecas. Sus habitantes construyeron conductos de piedra para el agua y trasladaron grandes bloques de basalto para esculpir monumentos. Destacan las cabezas colosales, interpretadas como retratos de gobernantes. Estas obras muestran la capacidad de organizar el trabajo de muchas personas. Fuente: López Austin y López Luján, El pasado indígena, p. 103.";
+
+  abrirModal();
+}
+function abrirFichaCentro(id) {
+
+if (id === "tenochtitlan") {
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #4b91bd";
+
+  document.getElementById("titulo-ficha").textContent =
+    "México-Tenochtitlan · Cuenca de México · Posclásico tardío · 1325–1521";
+
+  const texto = document.getElementById("texto-ficha");
+  texto.style.whiteSpace = "pre-line";
+  texto.textContent =
+    "México-Tenochtitlan creció como una ciudad lacustre comunicada mediante canales y calzadas. Su vida urbana se sostuvo en la agricultura, los recursos del lago, la producción artesanal y el intercambio en los mercados, entre los que destacó el de la vecina Tlatelolco. En su recinto ceremonial, el Templo Mayor vinculaba el poder político con el culto religioso.\n\nComo integrante de la Triple Alianza con Tetzcoco y Tlacopan, Tenochtitlan encabezó una expansión militar que sometió a numerosos pueblos al pago de tributo. Los productos y el trabajo de las comunidades tributarias sostuvieron a los grupos gobernantes y contribuyeron al esplendor de la ciudad. Este dominio encontró resistencias y coexistió con otros poderes, como el purépecha. Su historia permite relacionar el crecimiento urbano con la guerra, la tributación y las alianzas políticas.\n\nFuente: Pablo Escalante Gonzalbo, «El México antiguo», en Nueva historia mínima de México, El Colegio de México.";
+
+  const figura = document.getElementById("imagen-ficha");
+  figura.style.display = "block";
+  figura.querySelector("img").src = "imagenes/tenochtitlan.jpg";
+  figura.querySelector("img").alt =
+    "Cabeza de serpiente y restos arquitectónicos del Templo Mayor de México-Tenochtitlan";
+
+  figura.querySelector("figcaption").innerHTML = `
+    Templo Mayor de México-Tenochtitlan, Ciudad de México.
+    Fotografía: Juan Carlos Fonseca Mata. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es"
+       target="_blank" rel="noopener">CC BY-SA 4.0</a>.
+  `;
+
+  abrirModal();
+  return;
+}
+
+if (id === "tula") {
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #4b91bd";
+
+  document.getElementById("titulo-ficha").textContent =
+    "Tula · Hidalgo · Posclásico temprano · ca. 900–1150 d. C.";
+
+  const texto = document.getElementById("texto-ficha");
+  texto.style.whiteSpace = "pre-line";
+  texto.textContent =
+    "Tula fue uno de los principales centros políticos del Posclásico temprano. En ella confluyeron grupos procedentes del norte y poblaciones que conservaban tradiciones del Centro de México. Sus edificios y esculturas muestran la importancia de los guerreros y su relación con la religión: los llamados atlantes representan personajes armados, mientras que otros relieves muestran águilas y jaguares asociados con el sacrificio.\n\nSu poder favoreció redes de intercambio que alcanzaron regiones distantes. Además, Tula adquirió un prestigio que perduró después de su declive: distintos pueblos, entre ellos los mexicas, vincularon el origen de sus gobernantes con los toltecas y con Quetzalcóatl. Esa memoria convirtió a Tula en un referente de autoridad y civilización para sociedades posteriores.\n\nFuente: Pablo Escalante Gonzalbo, «El México antiguo», en Nueva historia mínima de México, El Colegio de México.";
+
+  const figura = document.getElementById("imagen-ficha");
+  figura.style.display = "block";
+  figura.querySelector("img").src = "imagenes/tula.jpg";
+  figura.querySelector("img").alt =
+    "Atlantes de Tula, Hidalgo, con indumentaria y atributos de guerreros";
+
+  figura.querySelector("figcaption").innerHTML = `
+    Atlantes de Tula, Hidalgo.
+    Fotografía: Luidger. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es"
+       target="_blank" rel="noopener">CC BY-SA 3.0</a>.
+  `;
+
+  abrirModal();
+  return;
+}
+
+  if (id === "xochicalco") {
+   const figura = document.getElementById("imagen-ficha");
+figura.style.display = "block";
+figura.querySelector("img").src = "imagenes/xochicalco.jpg";
+figura.querySelector("img").alt =
+  "Relieves del Templo de las Serpientes Emplumadas de Xochicalco";
+figura.querySelector("figcaption").innerHTML = `
+  Templo de las Serpientes Emplumadas, Xochicalco.
+  Fotografía: Giovani V, 2008.
+  <a href="https://commons.wikimedia.org/wiki/File:Xochicalco_Serpiente_Emplumada_GR.jpg"
+     target="_blank" rel="noopener">Wikimedia Commons</a>.
+  <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es"
+     target="_blank" rel="noopener">CC BY-SA 3.0</a>.
+`;
+
+    document.querySelector("#modal .contenido-modal").style.borderLeft =
+      "6px solid #4b91bd";
+
+    document.getElementById("titulo-ficha").textContent =
+      "Xochicalco · Morelos · Epiclásico · 650–900 d. C.";
+
+    const texto = document.getElementById("texto-ficha");
+    texto.style.whiteSpace = "pre-line";
+    texto.textContent =
+      "Xochicalco alcanzó su mayor desarrollo entre 650 y 900 d. C., durante el Epiclásico, cuando el declive de Teotihuacán dio paso a una reorganización de los centros de poder y las redes de intercambio. La ciudad fue construida sobre cerros acondicionados con terrazas, murallas y accesos controlados, que muestran la importancia de la defensa.\n\nSus habitantes mantuvieron relaciones con distintas regiones de Mesoamérica. Los relieves del Templo de las Serpientes Emplumadas reúnen elementos relacionados con el Centro de México, Oaxaca, el Golfo y el área maya. Xochicalco permite observar cómo surgieron nuevos poderes regionales que combinaron la fortificación de sus ciudades con amplios contactos culturales y comerciales.\n\nFuente: INAH, Zona Arqueológica de Xochicalco y Templo de las Serpientes Emplumadas.";
+
+    abrirModal();
+    return;
+  }
+
+  if (id === "teotihuacan") {
+    const figura = document.getElementById("imagen-ficha");
+figura.style.display = "block";
+figura.querySelector("img").src = "imagenes/teotihuacan.jpg";
+figura.querySelector("img").alt =
+  "Vista de las plazas y basamentos de Teotihuacán, con la Pirámide del Sol al fondo";
+figura.querySelector("figcaption").innerHTML = `
+  Teotihuacán, con la Pirámide del Sol al fondo.
+  Fotografía: SOL DRUMMER.
+  <a href="https://commons.wikimedia.org/wiki/File:Mfoto4_TEOTIHUACAN.jpg"
+     target="_blank" rel="noopener">Wikimedia Commons</a>.
+  <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es"
+     target="_blank" rel="noopener">CC BY-SA 4.0</a>.
+`;
+
+    document.querySelector("#modal .contenido-modal").style.borderLeft =
+      "6px solid #4b91bd";
+
+    document.getElementById("titulo-ficha").textContent =
+      "Teotihuacán · Cuenca de México · Clásico";
+
+    const texto = document.getElementById("texto-ficha");
+    texto.style.whiteSpace = "pre-line";
+    texto.textContent =
+      "Teotihuacán comenzó a crecer durante el Preclásico y alcanzó su mayor desarrollo en el Clásico. Su planificación incluía grandes avenidas, plazas, templos y conjuntos habitacionales. En sus barrios convivían poblaciones de distintos orígenes, dedicadas a actividades como la producción artesanal y el intercambio. Las viviendas y los espacios compartidos permiten conocer tanto la organización de la vida cotidiana como las diferencias sociales entre sus habitantes.\n\nLa ciudad mantuvo relaciones con diversas regiones de Mesoamérica mediante el intercambio de productos, el movimiento de personas y los vínculos políticos. Su importancia permite comprender cómo una gran concentración urbana articulaba actividades y poblaciones dentro de la ciudad y mantenía conexiones con lugares lejanos.";
+
+    abrirModal();
+    return;
+  }
+  if (id !== "cuicuilco") return;
+
+ const figura = document.getElementById("imagen-ficha");
+figura.style.display = "block";
+figura.querySelector("img").src = "imagenes/cuicuilco.jpg";
+figura.querySelector("img").alt =
+  "Vista posterior del basamento circular de Cuicuilco";
+figura.querySelector("figcaption").innerHTML = `
+  Basamento circular de Cuicuilco, vista posterior.
+  Fotografía: Mko xro, 2013. Wikimedia Commons.
+  <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es"
+     target="_blank" rel="noopener">CC BY-SA 3.0</a>.
+`;
+
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #4b91bd";
+
+  document.getElementById("titulo-ficha").textContent =
+    "Cuicuilco · Cuenca de México · Preclásico";
+
+  document.getElementById("texto-ficha").textContent =
+    "Cuicuilco fue uno de los primeros grandes centros cívicos y religiosos de la Cuenca de México. Destaca su gran basamento circular, donde se construyeron altares en distintas etapas. También se han encontrado representaciones tempranas del Dios Viejo del Fuego. Sus construcciones muestran la importancia de las ceremonias y la capacidad para organizar grandes obras colectivas. Fuente: INAH, Zona Arqueológica de Cuicuilco.";
+
+  abrirModal();
+}
+
+function abrirFichaSureste(id) {
+
+if (id === "chichen-itza") {
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #b87959";
+
+  document.getElementById("titulo-ficha").textContent =
+    "Chichén Itzá · Yucatán · Transición del Clásico al Posclásico · ca. 800–1200 d. C.";
+
+  const texto = document.getElementById("texto-ficha");
+  texto.style.whiteSpace = "pre-line";
+  texto.textContent =
+    "Chichén Itzá fue uno de los principales centros de poder del norte de la península de Yucatán. Su desarrollo abarcó los últimos siglos del Clásico y el Posclásico temprano, lo que permite reconocer que las transformaciones no ocurrieron al mismo tiempo en todas las regiones de Mesoamérica. La ciudad participó en amplias redes de intercambio y reunió tradiciones locales y elementos compartidos con otras regiones.\n\nEl Templo de los Guerreros, las columnatas, los chacmooles y las representaciones de serpientes emplumadas muestran semejanzas con Tula. Escalante destaca estos vínculos, aunque advierte que resulta difícil precisar cómo se establecieron. La arquitectura y las imágenes de ambas ciudades permiten reconocer la importancia de los guerreros, la religión y los contactos entre sociedades distantes.\n\nFuente: Pablo Escalante Gonzalbo, «El México antiguo», en Nueva historia mínima de México, El Colegio de México.";
+
+  const figura = document.getElementById("imagen-ficha");
+  figura.style.display = "block";
+  figura.querySelector("img").src = "imagenes/chichen_itza.jpg";
+  figura.querySelector("img").alt =
+    "Cabezas de serpiente en primer plano y El Castillo al fondo, en Chichén Itzá";
+
+  figura.querySelector("figcaption").innerHTML = `
+    Chichén Itzá, Yucatán.
+    Fotografía: Pavel Vorobiev. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es"
+       target="_blank" rel="noopener">CC BY-SA 3.0</a>.
+  `;
+
+  abrirModal();
+  return;
+}
+
+if (id === "tikal" || id === "palenque") {
+  const fichasClasico = {
+    tikal: {
+      titulo: "Tikal · Petén, Guatemala · Clásico",
+      texto: "Tikal tenía antecedentes preclásicos y durante el Clásico se consolidó como una poderosa ciudad maya, gobernada por una dinastía. Sus templos, plazas y monumentos inscritos muestran cómo los gobernantes vinculaban su autoridad con las ceremonias religiosas y la memoria de sus antepasados.\n\nLa escritura y el calendario permitieron registrar sucesiones, acontecimientos políticos y rituales con fechas precisas. Tikal mantuvo alianzas, rivalidades e intercambios con otras ciudades mayas y relaciones con Teotihuacán. Su historia permite comprender que el mundo maya estaba formado por distintos centros de poder relacionados entre sí."
+    },
+    palenque: {
+      titulo: "Palenque · Chiapas · Clásico",
+      texto: "Palenque fue una ciudad maya cuyo mayor esplendor ocurrió durante el Clásico. Sus gobernantes impulsaron la construcción de palacios y templos, acompañados de inscripciones y relieves que narraban acontecimientos de la dinastía y los relacionaban con dioses y antepasados.\n\nEl Templo de las Inscripciones, que alberga la tumba del gobernante K’inich Janaab’ Pakal, muestra la relación entre arquitectura, escritura y poder dinástico. Estos testimonios permiten conocer cómo los gobernantes buscaban legitimar su autoridad y conservar la memoria de su linaje."
+    }
+  };
+
+  const ficha = fichasClasico[id];
+
+  const figura = document.getElementById("imagen-ficha");
+figura.style.display = "block";
+
+if (id === "tikal") {
+  figura.querySelector("img").src = "imagenes/tikal.jpg";
+  figura.querySelector("img").alt =
+    "Vista de la Gran Plaza de Tikal, en Guatemala";
+
+  figura.querySelector("figcaption").innerHTML = `
+    Gran Plaza de Tikal, Guatemala.
+    Fotografía: chensiyuan. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es"
+       target="_blank" rel="noopener">CC BY-SA 4.0</a>.
+  `;
+}
+
+if (id === "palenque") {
+  figura.querySelector("img").src = "imagenes/palenque.jpg";
+  figura.querySelector("img").alt =
+    "Vista del Templo del Sol, el Templo XIV y el Palacio desde el Templo de la Cruz, en Palenque";
+
+  figura.querySelector("figcaption").innerHTML = `
+    Palenque, Chiapas. Vista desde el Templo de la Cruz.
+    Fotografía: Bernard DUPONT. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by-sa/2.0/deed.es"
+       target="_blank" rel="noopener">CC BY-SA 2.0</a>.
+  `;
+}
+
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #b87959";
+
+  document.getElementById("titulo-ficha").textContent = ficha.titulo;
+
+  const texto = document.getElementById("texto-ficha");
+  texto.style.whiteSpace = "pre-line";
+  texto.textContent = ficha.texto;
+
+  abrirModal();
+  return;
+}
+  if (id !== "el-mirador") return;
+
+  const figura = document.getElementById("imagen-ficha");
+figura.style.display = "block";
+figura.querySelector("img").src = "imagenes/el_mirador.jpg";
+figura.querySelector("img").alt =
+  "Vista aérea de La Danta, en El Mirador, Petén, Guatemala";
+figura.querySelector("figcaption").innerHTML = `
+  La Danta, El Mirador, Petén, Guatemala.
+  Imagen: Konjiki1. Wikimedia Commons.
+  <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.es"
+     target="_blank" rel="noopener">CC0 · Dominio público</a>.
+`;
+
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+"6px solid #b87959";
+
+  document.getElementById("titulo-ficha").textContent =
+    "El Mirador · Petén, Guatemala · Preclásico Tardío";
+
+  document.getElementById("texto-ficha").textContent =
+    "El Mirador fue un importante centro maya del Preclásico Tardío. Sus habitantes construyeron grandes conjuntos de edificios, como La Danta, y calzadas que comunicaban distintos sectores de la ciudad y otros asentamientos. Estas obras muestran que, desde este periodo, las sociedades mayas podían organizar el trabajo de numerosas personas. Fuentes: investigaciones del Proyecto Cuenca Mirador, publicadas en los simposios de la Asociación Tikal.";
+
+  abrirModal();
+}
+
+function abrirFichaOaxaca(id) {
+
+if (id === "tilantongo") {
+  document.querySelector("#modal .contenido-modal").style.borderLeft =
+    "6px solid #d4ad32";
+
+  document.getElementById("titulo-ficha").textContent =
+    "Tilantongo y los señoríos mixtecos · Oaxaca · Posclásico";
+
+  const texto = document.getElementById("texto-ficha");
+  texto.style.whiteSpace = "pre-line";
+  texto.textContent =
+    "Durante el Posclásico, los mixtecos se organizaron en señoríos gobernados por dinastías. Tilantongo, en la Mixteca Alta, fue uno de sus principales centros políticos. Los matrimonios entre familias gobernantes, las alianzas y las conquistas modificaban las relaciones entre estos señoríos. Entre sus gobernantes destacó 8 Venado Garra de Jaguar, cuyas acciones quedaron registradas en los códices.\n\nLos códices mixtecos conservaron genealogías, acontecimientos y relatos que sustentaban los derechos de las dinastías a gobernar. Escalante destaca que los relatos sobre 8 Venado lo relacionaban con la tradición de Tollan y Quetzalcóatl, compartida por distintos pueblos mesoamericanos. Estos documentos permiten estudiar cómo la escritura, la memoria histórica y la religión contribuían a legitimar el poder.\n\nFuentes: Pablo Escalante Gonzalbo, «El México antiguo», en Nueva historia mínima de México; estudios del INAH sobre los códices mixtecos y el señorío de Tilantongo.";
+
+  const figura = document.getElementById("imagen-ficha");
+  figura.style.display = "block";
+  figura.querySelector("img").src = "imagenes/ocho_venado.jpg";
+  figura.querySelector("img").alt =
+    "8 Venado Garra de Jaguar en el Códice Nuttall, con su nombre representado mediante ocho puntos y una cabeza de venado";
+
+  figura.querySelector("figcaption").innerHTML = `
+    8 Venado Garra de Jaguar. Detalle del Códice Nuttall.
+    Autor mixteco no identificado.
+    Reproducción consultada en Wikimedia Commons.
+    <a href="https://archive.org/details/codex-zouche-nuttall/page/n11/mode/2up"
+       target="_blank" rel="noopener">Fuente digital</a>.
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es"
+       target="_blank" rel="noopener">Licencia declarada: CC BY-SA 4.0</a>.
+  `;
+
+  abrirModal();
+  return;
+}
+  const fichas = {
+    "san-jose-mogote": {
+      titulo: "San José Mogote · Valle de Etla, Oaxaca · Preclásico",
+      texto: "Desde aproximadamente 1500 a. C., San José Mogote se desarrolló como una comunidad agrícola del valle de Etla. Con el tiempo se convirtió en una villa destacada de la región, con diferencias sociales, edificios para ceremonias públicas e intercambio de productos con lugares lejanos. Su historia permite observar cómo algunas aldeas se transformaron en asentamientos con una organización más jerarquizada, antes de la fundación de Monte Albán."
+    },
+    "monte-alban": {
+      titulo: "Monte Albán · Valles Centrales de Oaxaca · Preclásico",
+      texto: "Monte Albán fue fundada hacia 500 a. C., después del desarrollo de las villas de los valles de Oaxaca. Su fundación pudo ser resultado de una alianza entre varios asentamientos. La construcción de la ciudad en la cima de una montaña y la concentración de población muestran una nueva escala de organización política. Durante el Preclásico se fortaleció como centro de poder y continuó desarrollándose en el Clásico."
+    }
+  };
+
+if (id === "monte-alban" && periodoSeleccionado === "clasico") {
+  fichas["monte-alban"] = {
+    titulo: "Monte Albán · Valles Centrales de Oaxaca · Clásico",
+    texto: "Durante el Clásico, Monte Albán se consolidó como una gran ciudad y un centro de poder regional. La población habitaba tanto en la cima como en las terrazas acondicionadas en las laderas. Sus espacios residenciales, edificios públicos y tumbas permiten reconocer diferencias sociales y distintas actividades de sus habitantes.\n\nSu dominio sobre otras comunidades se sostuvo mediante la actividad militar y la tributación. La ciudad mantuvo también relaciones con otras regiones de Mesoamérica, entre ellas Teotihuacán. Esta etapa permite observar cómo el centro fundado en el Preclásico amplió y consolidó su poder durante los siglos siguientes."
+  };
+}
+
+  const ficha = fichas[id];
+  if (!ficha) return;
+document.querySelector("#modal .contenido-modal").style.borderLeft =
+  "6px solid #d4ad32";
+
+  const figura = document.getElementById("imagen-ficha");
+figura.style.display = "none";
+
+if (id === "san-jose-mogote") {
+  figura.style.display = "block";
+  figura.querySelector("img").src = "imagenes/san_jose_mogote.jpg";
+  figura.querySelector("img").alt =
+    "Escalinatas y basamento de San José Mogote, Oaxaca";
+  figura.querySelector("figcaption").innerHTML = `
+    San José Mogote, Oaxaca.
+    Fotografía: Maunus.
+    <a href="https://commons.wikimedia.org/wiki/File:San_Jose_Mogote_Pyramid.jpg"
+       target="_blank" rel="noopener">Wikimedia Commons</a>.
+    <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es"
+       target="_blank" rel="noopener">CC BY-SA 3.0</a>.
+  `;
+}
+if (id === "monte-alban") {
+  figura.style.display = "block";
+  figura.querySelector("img").src = "imagenes/monte_alban.jpg";
+  figura.querySelector("img").alt =
+    "Edificios y escalinatas de Monte Albán, Oaxaca";
+  figura.querySelector("figcaption").innerHTML = `
+    Monte Albán, Oaxaca. Vista actual del sitio.
+    Fotografía: Diego Tirira, 2004. Wikimedia Commons.
+    <a href="https://creativecommons.org/licenses/by-sa/2.0/deed.es"
+       target="_blank" rel="noopener">CC BY-SA 2.0</a>.
+  `;
+}
+  document.getElementById("titulo-ficha").textContent = ficha.titulo;
+  document.getElementById("texto-ficha").textContent = ficha.texto;
+
+  abrirModal();
+}
+function abrirModal() {
+    document.getElementById("modal").style.display = "flex";
+}
+
+function cerrarModal() {
+    document.getElementById("modal").style.display = "none";
+}
+</script>
+
+<div style="text-align:center; margin:20px auto; max-width:720px;">
+  <button id="boton-musica" type="button"
+          onclick="alternarMusica()" aria-pressed="false">
+    ♫ Activar música
+  </button>
+
+  <p style="font-size:12px; color:#666;">
+    “The Sky of our Ancestors” — Kevin MacLeod
+    (<a href="https://incompetech.com/"
+        target="_blank" rel="noopener">incompetech.com</a>).
+    Licencia
+    <a href="https://creativecommons.org/licenses/by/4.0/"
+       target="_blank" rel="noopener">CC BY 4.0</a>.
+  </p>
+</div>
+
+<audio id="musica-fondo" loop preload="none">
+  <source src="musica/the_sky_of_our_ancestors.mp3"
+          type="audio/mpeg">
+</audio>
+
+<script>
+async function alternarMusica() {
+  const musica = document.getElementById("musica-fondo");
+  const boton = document.getElementById("boton-musica");
+  musica.volume = 0.18;
+
+  if (musica.paused) {
+    try {
+      await musica.play();
+      boton.textContent = "♫ Silenciar música";
+      boton.setAttribute("aria-pressed", "true");
+    } catch (error) {
+      boton.textContent = "♫ Reintentar música";
+    }
+  } else {
+    musica.pause();
+    boton.textContent = "♫ Activar música";
+    boton.setAttribute("aria-pressed", "false");
+  }
+}
+</script>
+
+<footer style="max-width:850px; margin:24px auto; padding:16px;
+               border-top:1px solid #ccc; text-align:center;
+               font-size:13px; line-height:1.6; color:#555;">
+
+  <p>
+    <strong>Elaboración y diseño didáctico:</strong>
+    Elsa Rodríguez Saldaña.<br>
+    Desarrollo del interactivo con apoyo de ChatGPT.
+  </p>
+
+  <p>
+    <strong>Nota cartográfica:</strong>
+    Las ubicaciones de los sitios y los límites de las subáreas
+    culturales son aproximados y tienen fines didácticos.
+    Las subáreas representan espacios de interacción cultural
+    cuyas delimitaciones variaron a lo largo del tiempo.
+  </p>
+
+<p>
+  <strong>Mapa base:</strong>
+  <a href="https://commons.wikimedia.org/wiki/File:Mesoam%C3%A9rica_relief_map_with_continental_scale.png"
+     target="_blank" rel="noopener">
+    Mesoamérica relief map with continental scale
+  </a>,
+  El Comandante, con materiales de AlexCovarrubias
+  y Demis Web Map Server. Wikimedia Commons.
+  <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es"
+     target="_blank" rel="noopener">CC BY-SA 3.0</a>.
+  Adaptación didáctica: incorporación de capas de subáreas
+  culturales y marcadores de sitios. La adaptación cartográfica
+  se distribuye bajo la misma licencia.
+</p>
+</footer>
+
+</body>
+
+</html>
