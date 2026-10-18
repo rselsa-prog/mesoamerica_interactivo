@@ -163,6 +163,47 @@ button { min-height: 44px; padding: 10px 14px; cursor: pointer; font: inherit; }
  #imagen-ficha img { max-height: 210px !important; }
 }
 
+
+/* Controles y puntos del mapa */
+.periodos, .controles { gap: 8px; max-width: 800px; }
+.periodos button, .controles button {
+ border: 2px solid transparent; border-radius: 12px; color: #231e19;
+ font-family: system-ui, sans-serif; font-size: 15px; line-height: 1.2;
+ min-height: 44px; padding: 10px 14px; transition: box-shadow .15s;
+}
+.periodos button[data-periodo="preclasico"] { background: #eee5d8; }
+.periodos button[data-periodo="clasico"] { background: #d5b78e; }
+.periodos button[data-periodo="posclasico"] { background: #a46a32; color: white; }
+.controles button[data-subarea="occidente"] { background: rgba(147,107,53,.23); }
+.controles button[data-subarea="norte"] { background: rgba(112,80,140,.23); }
+.controles button[data-subarea="centro"] { background: rgba(75,145,189,.25); }
+.controles button[data-subarea="golfo"] { background: rgba(193,91,181,.23); }
+.controles button[data-subarea="oaxaca"] { background: rgba(212,173,50,.28); }
+.controles button[data-subarea="sureste"] { background: rgba(184,121,89,.25); }
+.periodos button[aria-pressed="true"], .controles button[aria-pressed="true"] {
+ border-color: #30271f; box-shadow: 0 0 0 2px white, 0 0 0 3px #30271f;
+ font-weight: 700;
+}
+button:focus-visible { outline: 3px solid #1c506c; outline-offset: 4px; }
+.mapa .sitio {
+ width: 32px; height: 32px; padding: 0; transform: translate(-50%,-50%);
+ cursor: pointer; border-radius: 50%; touch-action: manipulation;
+}
+.piramide-sitio { position: absolute; width: 20px; height: 18px; top: 50%; left: 50%;
+ transform: translate(-50%,-50%); pointer-events: none;
+ filter: drop-shadow(0 1px 1px white) drop-shadow(0 -1px 1px white); }
+.piramide-sitio::before { content: ""; position: absolute; inset: 0;
+ background: #30251a;
+ clip-path: polygon(40% 0,60% 0,60% 20%,70% 20%,70% 40%,80% 40%,80% 60%,90% 60%,90% 80%,100% 80%,100% 100%,0 100%,0 80%,10% 80%,10% 60%,20% 60%,20% 40%,30% 40%,30% 20%,40% 20%); }
+.piramide-sitio::after { content: ""; position: absolute; width: 3px; top: 4px; bottom: 1px; left: calc(50% - 1.5px); background: #e7d7b9; }
+.sitio:focus-visible { outline: 3px solid #201c17; outline-offset: 1px; }
+@media (max-width: 600px) {
+ h1 { font-size: 1.45rem; line-height: 1.15; margin: 12px 0; }
+ .periodos { display: grid; grid-template-columns: repeat(3,1fr); }
+ .controles { display: grid; grid-template-columns: repeat(3,1fr); }
+ .periodos button, .controles button { font-size: 14px; padding: 9px 5px; }
+}
+
 </style>
 
 </head>
@@ -171,18 +212,18 @@ button { min-height: 44px; padding: 10px 14px; cursor: pointer; font: inherit; }
 <h1>Mesoamérica en el espacio y el tiempo</h1>
 
 <div class="periodos">
-    <button onclick="seleccionarPeriodo('preclasico')">Preclásico</button>
-    <button onclick="seleccionarPeriodo('clasico')">Clásico</button>
-    <button onclick="seleccionarPeriodo('posclasico')">Posclásico</button>
+    <button data-periodo="preclasico" aria-pressed="false" onclick="seleccionarPeriodo('preclasico')">Preclásico</button>
+    <button data-periodo="clasico" aria-pressed="false" onclick="seleccionarPeriodo('clasico')">Clásico</button>
+    <button data-periodo="posclasico" aria-pressed="false" onclick="seleccionarPeriodo('posclasico')">Posclásico</button>
 </div>
 
 <div class="controles">
-  <button onclick="seleccionarSubarea('occidente')">Occidente</button>
-   <button onclick="seleccionarSubarea('norte')">Norte</button>
-   <button onclick="seleccionarSubarea('centro')">Centro</button>
-  <button onclick="seleccionarSubarea('golfo')">Golfo</button>
-<button onclick="seleccionarSubarea('oaxaca')">Oaxaca</button>
-<button onclick="seleccionarSubarea('sureste')">Sureste</button>
+  <button data-subarea="occidente" aria-pressed="false" onclick="seleccionarSubarea('occidente')">Occidente</button>
+   <button data-subarea="norte" aria-pressed="false" onclick="seleccionarSubarea('norte')">Norte</button>
+   <button data-subarea="centro" aria-pressed="false" onclick="seleccionarSubarea('centro')">Centro</button>
+  <button data-subarea="golfo" aria-pressed="false" onclick="seleccionarSubarea('golfo')">Golfo</button>
+<button data-subarea="oaxaca" aria-pressed="false" onclick="seleccionarSubarea('oaxaca')">Oaxaca</button>
+<button data-subarea="sureste" aria-pressed="false" onclick="seleccionarSubarea('sureste')">Sureste</button>
 </div>
 
 <div id="aviso-subarea" role="status" style="display:none;max-width:850px;margin:16px auto;padding:18px 24px;background:#f5f1e8;border-left: 5px solid #936b35;line-height:1.6"></div>
@@ -193,164 +234,126 @@ button { min-height: 44px; padding: 10px 14px; cursor: pointer; font: inherit; }
 
 <div id="tzintzuntzan"
      class="sitio sitio-occidente sitio-posclasico"
-     role="button"
-     tabindex="0"
+    
+    
      onclick="abrirFichaOccidente('tzintzuntzan')"
      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOccidente('tzintzuntzan');}"
-     style="top: 46.093750%;left: 35.416667%;cursor:pointer;">
-  ● Tzintzuntzan
-</div>
+     style="top: 46.093750%;left: 35.416667%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Tzintzuntzan"><span class="piramide-sitio" aria-hidden="true"></span></div>
 <div id="puntero-occidente" class="puntero" onclick="abrirModal()">ⓘ</div>
-<div id="el-openo" class="sitio sitio-occidente sitio-preclasico" role="button" tabindex="0" onclick="abrirFichaOccidente('el-openo')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOccidente('el-openo')}">● El Opeño</div>
-<div id="chupicuaro" class="sitio sitio-occidente sitio-preclasico" role="button" tabindex="0" onclick="abrirFichaOccidente('chupicuaro')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOccidente('chupicuaro')}"><span style="position:absolute;right:14px;bottom:18px;white-space:nowrap;">Chupícuaro</span>●</div>
+<div id="el-openo" class="sitio sitio-occidente sitio-preclasico" onclick="abrirFichaOccidente('el-openo')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOccidente('el-openo')}" role="button" tabindex="0" aria-label="Abrir ficha de El Opeño"><span class="piramide-sitio" aria-hidden="true"></span></div>
+<div id="chupicuaro" class="sitio sitio-occidente sitio-preclasico" onclick="abrirFichaOccidente('chupicuaro')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOccidente('chupicuaro')}" role="button" tabindex="0" aria-label="Abrir ficha de Chupícuaro"><span class="piramide-sitio" aria-hidden="true"></span></div>
 
 <div id="guachimontones"
      class="sitio sitio-occidente sitio-clasico"
-     role="button"
-     tabindex="0"
+    
+    
      onclick="abrirFichaOccidente('guachimontones')"
      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOccidente('guachimontones');}"
-     style="top: 37.500000%;left: 26.041667%;cursor:pointer;">
-  ● Guachimontones
-</div>
+     style="top: 37.500000%;left: 26.041667%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Guachimontones"><span class="piramide-sitio" aria-hidden="true"></span></div>
 
 <img id="norte" class="capa" src="imagenes/capa_norte.png">
 
 <div id="la-quemada"
      class="sitio sitio-norte sitio-clasico"
-     role="button"
-     tabindex="0"
+    
+    
      onclick="abrirFichaNorte('la-quemada')"
      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaNorte('la-quemada');}"
-     style="top: 28.125000%;left: 28.645833%;cursor:pointer;">
-  ● La Quemada
-</div>
+     style="top: 28.125000%;left: 28.645833%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de La Quemada"><span class="piramide-sitio" aria-hidden="true"></span></div>
 <img id="centro" class="capa" src="imagenes/capa_centro.png">
 
 <div id="tula"
      class="sitio sitio-centro sitio-posclasico"
-     role="button"
-     tabindex="0"
+    
+    
      onclick="abrirFichaCentro('tula')"
      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaCentro('tula');}"
-     style="top: 39.062500%;left: 40.104167%;cursor:pointer;">
-  ● Tula
-</div>
+     style="top: 39.062500%;left: 40.104167%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Tula"><span class="piramide-sitio" aria-hidden="true"></span></div>
 
 <div id="tenochtitlan"
      class="sitio sitio-centro sitio-posclasico"
-     role="button"
-     tabindex="0"
+    
+    
      onclick="abrirFichaCentro('tenochtitlan')"
      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaCentro('tenochtitlan');}"
-     style="top: 44.921875%;left: 41.666667%;cursor:pointer;">
-  ● México-Tenochtitlan
-</div>
+     style="top: 44.921875%;left: 41.666667%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de México-Tenochtitlan"><span class="piramide-sitio" aria-hidden="true"></span></div>
 <div id="cuicuilco"
      class="sitio sitio-centro sitio-preclasico"
      onclick="abrirFichaCentro('cuicuilco')"
-     style="cursor:pointer;">
-  ● Cuicuilco
-</div>
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Cuicuilco" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
 <div id="teotihuacan"
      class="sitio sitio-centro sitio-clasico"
      onclick="abrirFichaCentro('teotihuacan')"
-     style="cursor:pointer;">
-  ● Teotihuacan
-</div>
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Teotihuacan" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
 
 <div id="xochicalco"
      class="sitio sitio-centro sitio-clasico"
      onclick="abrirFichaCentro('xochicalco')"
-     style="cursor:pointer;">
-  ● Xochicalco
-</div>
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Xochicalco" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
 <img id="golfo" class="capa" src="imagenes/capa_golfo.png">
 
 <div id="cempoala"
      class="sitio sitio-golfo sitio-posclasico"
-     role="button"
-     tabindex="0"
+    
+    
      onclick="abrirFichaGolfo('cempoala')"
      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaGolfo('cempoala');}"
-     style="top:45%;left:51%;cursor:pointer;">
-  ● Cempoala
-</div>
+     style="top:45%;left:51%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Cempoala"><span class="piramide-sitio" aria-hidden="true"></span></div>
 <div id="san-lorenzo"
      class="sitio sitio-golfo sitio-preclasico"
      onclick="abrirFichaGolfo('san-lorenzo')"
-     style="cursor:pointer;">
-  ● San Lorenzo
-</div>
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de San Lorenzo" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
 
 <div id="la-venta"
      class="sitio sitio-golfo sitio-preclasico"
      onclick="abrirFichaGolfo('la-venta')"
-     style="cursor:pointer;">
-  ● La Venta
-</div>
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de La Venta" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
 <div id="el-tajin"
      class="sitio sitio-golfo sitio-clasico"
      onclick="abrirFichaGolfo('el-tajin')"
-     style="cursor:pointer;">
-  ● El Tajín
-</div>
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de El Tajín" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
 <img id="oaxaca" class="capa" src="imagenes/capa_oaxaca.png">
 
 <div id="tilantongo"
      class="sitio sitio-oaxaca sitio-posclasico"
-     role="button"
-     tabindex="0"
+    
+    
      onclick="abrirFichaOaxaca('tilantongo')"
      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaOaxaca('tilantongo');}"
-     style="top:55%;left:48%;cursor:pointer;">
-  ● Tilantongo
-</div>
+     style="top:55%;left:48%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Tilantongo"><span class="piramide-sitio" aria-hidden="true"></span></div>
 <div id="san-jose-mogote"
      class="sitio sitio-oaxaca sitio-preclasico"
      onclick="abrirFichaOaxaca('san-jose-mogote')"
-     style="cursor:pointer;">
-  ● San José Mogote
-</div>
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de San José Mogote" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
 
 <div id="monte-alban"
      class="sitio sitio-oaxaca sitio-preclasico sitio-clasico"
      onclick="abrirFichaOaxaca('monte-alban')"
-     style="cursor:pointer;">
-  ● Monte Albán
-</div>
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Monte Albán" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
 <img id="sureste" class="capa" src="imagenes/capa_sureste.png">
 
 <div id="chichen-itza"
      class="sitio sitio-sureste sitio-posclasico"
-     role="button"
-     tabindex="0"
+    
+    
      onclick="abrirFichaSureste('chichen-itza')"
      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirFichaSureste('chichen-itza');}"
-     style="top: 37.500000%;left: 75.520833%;cursor:pointer;">
-  ● Chichén Itzá
-</div>
+     style="top: 42.5%;left: 82%;cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Chichén Itzá"><span class="piramide-sitio" aria-hidden="true"></span></div>
 
 <div id="el-mirador"
      class="sitio sitio-sureste sitio-preclasico"
      onclick="abrirFichaSureste('el-mirador')"
-     style="cursor:pointer;">
-  ● El Mirador
-</div>
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de El Mirador" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
 
 <div id="tikal"
      class="sitio sitio-sureste sitio-clasico"
      onclick="abrirFichaSureste('tikal')"
-     style="cursor:pointer;">
-  ● Tikal
-</div>
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Tikal" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
 
 <div id="palenque"
      class="sitio sitio-sureste sitio-clasico"
      onclick="abrirFichaSureste('palenque')"
-     style="cursor:pointer;">
-  ● Palenque
-</div>
+     style="cursor:pointer;" role="button" tabindex="0" aria-label="Abrir ficha de Palenque" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"><span class="piramide-sitio" aria-hidden="true"></span></div>
 
 </div>
 
@@ -391,6 +394,8 @@ let periodoSeleccionado = "";
 let subareaSeleccionada = "";
 
 function seleccionarPeriodo(periodo) {
+    document.querySelectorAll('[data-periodo]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.periodo === periodo)));
+    document.querySelectorAll('[data-subarea]').forEach(b => b.setAttribute('aria-pressed', 'false'));
     periodoSeleccionado = periodo;
     document.getElementById("aviso-subarea").style.display = "none";
     document.querySelectorAll(".puntero").forEach(p=>p.style.display="none");
@@ -443,6 +448,7 @@ function explorarPeriodo() {
 }
 
 function seleccionarSubarea(subarea) {
+    document.querySelectorAll('[data-subarea]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.subarea === subarea)));
     subareaSeleccionada = subarea;
     mostrarCapa(subarea);
 
